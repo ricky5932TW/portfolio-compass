@@ -993,7 +993,7 @@ export default function App() {
       <footer className="site-footer">
         <p><strong>持倉羅盤</strong> · 資料留在本機，備份由你掌握。</p>
         <p>本工具僅提供投資組合整理與情境試算，不構成投資建議或買賣指示。請自行核對報價、匯率與交易單位。</p>
-        <a href="/privacy.html">隱私與資料說明</a>
+        <a href="./privacy.html">隱私與資料說明</a>
       </footer>
     </div>
   );
