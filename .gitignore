@@ -1,4 +1,8 @@
 node_modules/
+.tools/
+.promo-tools/
+artifacts/narration-source/
+artifacts/promo-with-voice.mp4
 dist/
 .wrangler/
 coverage/

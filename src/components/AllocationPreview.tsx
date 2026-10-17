@@ -144,7 +144,7 @@ export default function AllocationPreview({
         id: key,
         name: h.instrument.name || h.instrument.symbol,
         pct,
-        color: colorMap.get(key) || '#94a3b8',
+        color: colorMap.get(key) || 'var(--text-muted)',
         shortLabel: h.instrument.symbol,
       });
     }
@@ -162,7 +162,7 @@ export default function AllocationPreview({
     });
   }
   if (unallocatedTarget > 0) targetSlices.push({
-    id: '__unallocated__', name: '未配置', pct: unallocatedTarget, color: '#cbd5e1',
+    id: '__unallocated__', name: '未配置', pct: unallocatedTarget, color: 'var(--border-strong)',
   });
   const totalTargetWeight = targetSlices.reduce((sum, s) => sum + s.pct, 0);
   const pieSize = 136;
@@ -185,7 +185,7 @@ export default function AllocationPreview({
           id: key,
           name: h.instrument.name || h.instrument.symbol,
           pct,
-          color: colorMap.get(key) || '#94a3b8',
+          color: colorMap.get(key) || 'var(--text-muted)',
           shortLabel: h.instrument.symbol,
         });
       }
@@ -221,7 +221,7 @@ export default function AllocationPreview({
       symbol: h.instrument.symbol,
       unrealizedPlPct: h.unrealizedPlPct,
       pct,
-      color: colorMap.get(id) || '#94a3b8',
+      color: colorMap.get(id) || 'var(--text-muted)',
       currentPct,
       gapPct: currentPct === undefined ? undefined : pct - currentPct,
       currentLabel: '目前',
@@ -243,7 +243,7 @@ export default function AllocationPreview({
     });
   }
   if (unallocatedTarget > 0) targetLegendRows.push({
-    id: '__unallocated__', name: '未配置', pct: unallocatedTarget, color: '#cbd5e1', unallocated: true,
+    id: '__unallocated__', name: '未配置', pct: unallocatedTarget, color: 'var(--border-strong)', unallocated: true,
   });
 
   const overinvestedRows = targetLegendRows
@@ -262,7 +262,7 @@ export default function AllocationPreview({
     const targetPct = h.instrument.targetWeightPct ?? 0;
     if ((currentPct ?? 0) <= 0 && targetPct <= 0 && h.instrument.quantity <= 0) return [];
     return [{ id, name: h.instrument.name || h.instrument.symbol, shortLabel: h.instrument.symbol,
-      pct: targetPct, targetPct, currentPct, color: colorMap.get(id) || '#94a3b8' }];
+      pct: targetPct, targetPct, currentPct, color: colorMap.get(id) || 'var(--text-muted)' }];
   });
   if (resolvedCashTarget > 0 || (currentCashPct ?? 0) > 0) comparisonRows.push({
     id: '__cash__', name: '現金', pct: resolvedCashTarget, targetPct: resolvedCashTarget,
@@ -270,12 +270,12 @@ export default function AllocationPreview({
   });
   if (unallocatedTarget > 0) comparisonRows.push({
     id: '__unallocated__', name: '未配置', pct: unallocatedTarget, targetPct: unallocatedTarget,
-    color: '#cbd5e1',
+    color: 'var(--border-strong)',
   });
 
   const cardStyle: React.CSSProperties = {
-    backgroundColor: '#ffffff',
-    border: '1px solid #e2e8f0',
+    backgroundColor: 'var(--card-bg)',
+    border: '1px solid var(--border-color)',
     borderRadius: 8,
     padding: 12,
     boxSizing: 'border-box',
@@ -298,20 +298,20 @@ export default function AllocationPreview({
         alignItems: 'center', fontSize: 11,
       }}
     >
-      <li style={{ color: '#64748b', fontWeight: 600 }}>資產</li>
-      <li style={{ color: '#64748b', textAlign: 'right', fontWeight: 600 }}>目前</li>
-      <li style={{ color: '#64748b', textAlign: 'right', fontWeight: 600 }}>目標</li>
+      <li style={{ color: 'var(--text-muted)', fontWeight: 600 }}>資產</li>
+      <li style={{ color: 'var(--text-muted)', textAlign: 'right', fontWeight: 600 }}>目前</li>
+      <li style={{ color: 'var(--text-muted)', textAlign: 'right', fontWeight: 600 }}>目標</li>
       {comparisonRows.map((row) => (
         <React.Fragment key={row.id}>
           <li style={{ display: 'contents' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, color: '#334155' }} title={row.name}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, color: 'var(--text-main)' }} title={row.name}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: row.color, flexShrink: 0 }} aria-hidden="true" />
               <span style={{ overflowWrap: 'anywhere' }}>{row.name}</span>
             </span>
-            <span style={{ textAlign: 'right', fontWeight: 600, color: '#475569', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>
               {row.currentPct === undefined ? '—' : `${row.currentPct.toFixed(1)}%`}
             </span>
-            <span style={{ textAlign: 'right', fontWeight: 600, color: '#475569', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>
               {row.targetPct?.toFixed(1)}%
             </span>
           </li>
@@ -339,9 +339,9 @@ export default function AllocationPreview({
             key={row.id}
             style={{
               padding: '5px 6px', borderRadius: 6,
-              backgroundColor: alert ? '#fef2f2' : caution ? '#fffbeb' : '#f8fafc',
-              border: `1px solid ${alert ? '#fecaca' : caution ? '#fde68a' : '#e2e8f0'}`,
-              color: alert ? '#b91c1c' : caution ? '#92400e' : '#334155',
+              backgroundColor: alert ? (row.gapPct! > 0 ? 'var(--action-buy-bg)' : 'var(--action-sell-bg)') : 'var(--surface-subtle)',
+              border: `1px solid ${alert ? (row.gapPct! > 0 ? 'var(--action-buy-border)' : 'var(--action-sell-border)') : 'var(--border-color)'}`,
+              color: row.gapPct === undefined || Math.abs(row.gapPct) < 0.05 ? 'var(--text-secondary)' : row.gapPct > 0 ? 'var(--action-buy-text)' : 'var(--action-sell-text)',
               fontSize: 11, lineHeight: 1.4,
             }}
           >
@@ -357,7 +357,7 @@ export default function AllocationPreview({
               {row.symbol && <span
                 aria-label={`未實現報酬率 ${row.unrealizedPlPct === undefined ? '無資料' : `${row.unrealizedPlPct >= 0 ? '+' : ''}${row.unrealizedPlPct.toFixed(1)}%`}`}
                 title="未實現報酬率（相對於持倉成本）"
-                style={{ flexShrink: 0, marginLeft: 'auto', color: row.unrealizedPlPct === undefined ? '#64748b' : row.unrealizedPlPct > 0 ? '#dc2626' : row.unrealizedPlPct < 0 ? '#16a34a' : '#64748b', fontVariantNumeric: 'tabular-nums' }}
+                style={{ flexShrink: 0, marginLeft: 'auto', color: row.unrealizedPlPct === undefined ? 'var(--text-muted)' : row.unrealizedPlPct > 0 ? 'var(--profit-text)' : row.unrealizedPlPct < 0 ? 'var(--loss-text)' : 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}
               >
                 {row.unrealizedPlPct === undefined ? '報酬 —' : `報酬 ${row.unrealizedPlPct >= 0 ? '+' : ''}${row.unrealizedPlPct.toFixed(1)}%`}
               </span>}
@@ -386,7 +386,7 @@ export default function AllocationPreview({
     return <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 150 }}>
       {groups.filter(([, rows]) => rows.length > 0).map(([label, rows]) => (
         <section key={label} aria-label={label}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#475569', marginBottom: 4 }}>{label}</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: label === '投入過多' ? 'var(--action-sell-text)' : label === '投入過少' ? 'var(--action-buy-text)' : 'var(--text-secondary)', marginBottom: 4 }}>{label}</div>
           {renderTargetLegendRows(rows)}
         </section>
       ))}
@@ -401,14 +401,14 @@ export default function AllocationPreview({
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ ...cardStyle, width: '100%', maxWidth: 560, margin: '0 auto' }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>資產配置比較</div>
-        <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>
+      <div style={{ ...cardStyle, width: '100%', maxWidth: 760, margin: '0 auto' }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>資產配置比較</div>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>
           兩側使用相同標的顏色；小扇區的精確比例列於下方圖例。
         </div>
         <div className="allocation-pie-pair">
-          <div style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: 10, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', textAlign: 'center' }}>目前配置</div>
+          <div style={{ border: '1px solid var(--border-color)', borderRadius: 8, padding: 10, minWidth: 0 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', textAlign: 'center' }}>目前配置</div>
             {isCurrentValid && currentSlices.length > 0 ? (
               <div
                 role="img"
@@ -426,13 +426,13 @@ export default function AllocationPreview({
                 </svg>
               </div>
             ) : (
-              <div role="img" aria-label={complete ? '目前配置：尚無資產' : '目前配置：估值不完整'} style={{ ...pieCircleStyle, margin: '10px auto 2px', border: '2px dashed #cbd5e1', backgroundColor: '#f8fafc', boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 8, boxSizing: 'border-box', fontSize: 11, color: '#64748b', lineHeight: 1.4 }}>
+              <div role="img" aria-label={complete ? '目前配置：尚無資產' : '目前配置：估值不完整'} style={{ ...pieCircleStyle, margin: '10px auto 2px', border: '2px dashed var(--border-strong)', backgroundColor: 'var(--surface-subtle)', boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 8, boxSizing: 'border-box', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
                 {complete ? '尚無資產' : '估值不完整'}
               </div>
             )}
           </div>
-          <div style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: 10, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', textAlign: 'center' }}>目標配置</div>
+          <div style={{ border: '1px solid var(--border-color)', borderRadius: 8, padding: 10, minWidth: 0 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', textAlign: 'center' }}>目標配置</div>
             {targetSlices.length > 0 ? (
               <div
                 role="img"
@@ -450,21 +450,21 @@ export default function AllocationPreview({
                 </svg>
               </div>
             ) : (
-              <div role="img" aria-label="目標配置：尚無設定" style={{ ...pieCircleStyle, margin: '10px auto 2px', border: '2px dashed #cbd5e1', backgroundColor: '#f8fafc', boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 8, boxSizing: 'border-box', fontSize: 11, color: '#64748b' }}>
+              <div role="img" aria-label="目標配置：尚無設定" style={{ ...pieCircleStyle, margin: '10px auto 2px', border: '2px dashed var(--border-strong)', backgroundColor: 'var(--surface-subtle)', boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 8, boxSizing: 'border-box', fontSize: 11, color: 'var(--text-muted)' }}>
                 尚無設定
               </div>
             )}
           </div>
         </div>
         {renderComparisonLegend()}
-        <div aria-label={`尚未配置 ${unallocatedTarget.toFixed(1)}%`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 14, padding: '10px 12px', border: '1px solid #fdba74', borderRadius: 8, background: '#fff7ed' }}>
+        <div aria-label={`尚未配置 ${unallocatedTarget.toFixed(1)}%`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 14, padding: '10px 12px', border: `1px solid ${unallocatedTarget > 0 ? 'var(--warning-border)' : 'var(--success-border)'}`, borderRadius: 8, background: unallocatedTarget > 0 ? 'var(--warning-bg)' : 'var(--success-bg)', color: unallocatedTarget > 0 ? 'var(--warning-text)' : 'var(--brand)' }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#9a3412' }}>尚未配置</div>
-            <div style={{ fontSize: 10, color: '#9a3412', marginTop: 2 }}>未指派至股票或現金目標</div>
+            <div style={{ fontSize: 12, fontWeight: 700 }}>尚未配置</div>
+            <div style={{ fontSize: 10, marginTop: 2 }}>未指派至股票或現金目標</div>
           </div>
-          <strong style={{ fontSize: 24, lineHeight: 1, color: '#9a3412', fontVariantNumeric: 'tabular-nums' }}>{unallocatedTarget.toFixed(1)}%</strong>
+          <strong style={{ fontSize: 24, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{unallocatedTarget.toFixed(1)}%</strong>
         </div>
-        <label style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 10, fontSize: 11, color: '#475569' }}>
+        <label style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 10, fontSize: 11, color: 'var(--text-secondary)' }}>
           再平衡警示門檻（百分點）
           <input
             type="number"
@@ -474,11 +474,11 @@ export default function AllocationPreview({
             value={thresholdInput}
             onChange={(event) => updateThreshold(event.target.value)}
             onBlur={() => { if (!validThreshold(Number(thresholdInput))) setThresholdInput(String(gapThreshold)); }}
-            style={{ width: 65, padding: '3px 5px', border: '1px solid #cbd5e1', borderRadius: 4, fontSize: 12 }}
+            style={{ width: 65, padding: '3px 5px', border: '1px solid var(--border-strong)', borderRadius: 4, fontSize: 12 }}
           />
-          <span style={{ color: '#64748b' }}>達門檻時標紅</span>
+          <span style={{ color: 'var(--text-muted)' }}>達門檻時強調 · 藍色補足／琥珀調減</span>
         </label>
-        <fieldset style={{ border: 0, padding: 0, margin: '10px 0 0', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 11, color: '#475569' }}>
+        <fieldset style={{ border: 0, padding: 0, margin: '10px 0 0', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 11, color: 'var(--text-secondary)' }}>
           <legend style={{ padding: 0, marginBottom: 4, fontWeight: 600 }}>各市場最低操作股數</legend>
           {([['TW', '台股'], ['TWO', '上櫃'], ['US', '美股'], ['JP', '日股']] as const).map(([market, label]) => (
             <label key={market} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -494,12 +494,12 @@ export default function AllocationPreview({
                   const value = Number(minimumInputs[market]);
                   if (!Number.isInteger(value) || value < 1 || value > 1_000_000) setMinimumInputs((current) => ({ ...current, [market]: String(marketMinimumShares[market]) }));
                 }}
-                style={{ width: 60, padding: '3px 5px', border: '1px solid #cbd5e1', borderRadius: 4, fontSize: 12 }} />
+                style={{ width: 60, padding: '3px 5px', border: '1px solid var(--border-strong)', borderRadius: 4, fontSize: 12 }} />
             </label>
           ))}
-          <span style={{ color: '#64748b' }}>預設：台股／美股 1 股，日股 100 股</span>
+          <span style={{ color: 'var(--text-muted)' }}>預設：台股／美股 1 股，日股 100 股</span>
         </fieldset>
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginTop: 12, marginBottom: 5 }}>再平衡差距</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginTop: 12, marginBottom: 5 }}>再平衡差距</div>
         {renderTargetLegend()}
       </div>
     </section>

@@ -1,0 +1,26 @@
+﻿<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>持倉羅盤｜宣傳動畫</title>
+<style>
+:root{color-scheme:dark;font-family:"Microsoft JhengHei",system-ui,sans-serif;background:#0b1728;color:#ecf4fa}*{box-sizing:border-box}body{margin:0;padding:36px 5vw}main{max-width:1440px;margin:auto}header{display:flex;gap:20px;justify-content:space-between;align-items:center;margin-bottom:24px}h1{font-size:clamp(22px,3vw,36px);margin:0}a{color:#69d5bd;text-underline-offset:5px}p{color:#95aabd;line-height:1.7}video{display:block;width:100%;aspect-ratio:16/9;background:#10243a;border:1px solid #284157;border-radius:20px}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:20px;padding:18px;background:#10243a;border:1px solid #284157;border-radius:16px}button,.download{min-height:48px;padding:12px 20px;border:1px solid #69d5bd;border-radius:10px;background:transparent;color:#ecf4fa;font:inherit;cursor:pointer}button.primary{background:#69d5bd;color:#0b1728;font-weight:700}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #7db4ff;outline-offset:4px}label{display:flex;gap:12px;align-items:center;flex:1;min-width:220px}input{flex:1;min-width:100px;accent-color:#69d5bd}output{font-variant-numeric:tabular-nums;white-space:nowrap}.notes{font-size:14px}.chapters{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.chapters button{border-color:#284157;color:#95aabd}.download{display:inline-flex;align-items:center;text-decoration:none}@media(max-width:600px){body{padding:22px 16px}header{align-items:flex-start}header a{white-space:nowrap}video{border-radius:12px}.toolbar{padding:12px}button{padding:10px 15px}label{width:100%;flex-basis:100%}.chapters button{flex:1 1 40%}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style></head>
+<body><main>
+<header><div><h1>看懂配置，讓每一步更有方向。</h1><p>持倉羅盤 · 24 秒品牌短片</p></div><a href="../../">開啟產品 →</a></header>
+<video id="film" preload="metadata" poster="./poster.jpg" playsinline aria-label="持倉羅盤宣傳動畫，24秒，台灣華語配音" controls><source src="./promo.mp4" type="video/mp4"><track kind="captions" src="./narration.zh-TW.vtt" srclang="zh-TW" label="繁體中文字幕" default>您的瀏覽器無法播放影片，請下載 MP4。</video>
+<div class="toolbar" role="group" aria-label="影片控制">
+<button id="play" class="primary">播放</button><button id="pause">暫停</button><button id="replay">重播</button>
+<label for="seek">時間 <input id="seek" type="range" min="0" max="24" step="0.01" value="0" aria-label="影片時間"><output id="time">0.0 / 24.0 秒</output></label>
+<a class="download" href="./promo.mp4" download="portfolio-compass-promo.mp4">下載 MP4</a><a class="download" href="./narration.zh-TW.wav" download="portfolio-compass-voiceover.wav">下載旁白 WAV</a></div>
+<nav class="chapters" aria-label="影片章節"><button data-t="0">01 資產全貌</button><button data-t="5.5">02 市場匯聚</button><button data-t="11">03 配置差距</button><button data-t="16.5">04 本機與備份</button><button data-t="22">05 持倉羅盤</button></nav>
+<p class="notes">示意資料，非即時行情。影片為產品介面的動態示意，配置試算不會自動下單。<br>1920 × 1080 · H.264 · 24 fps · 台灣華語配音 · 繁體中文字幕。預設靜止海報，按播放才開始。可用 <code>?t=11</code> 開啟指定時間畫面。<br>已開啟「減少動態效果」的裝置同樣保留靜止海報；可自行選擇播放或章節。</p>
+</main><script>
+const film=document.getElementById('film'),seek=document.getElementById('seek'),time=document.getElementById('time');
+const show=()=>{seek.value=film.currentTime;time.value=`${film.currentTime.toFixed(1)} / 24.0 秒`};
+const jump=t=>{film.pause();film.currentTime=Math.max(0,Math.min(23.99,t));show()};
+document.getElementById('play').onclick=()=>film.play();document.getElementById('pause').onclick=()=>film.pause();document.getElementById('replay').onclick=()=>{film.currentTime=0;film.play()};seek.oninput=()=>jump(Number(seek.value));film.ontimeupdate=show;
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>jump(Number(b.dataset.t)));
+const query=new URLSearchParams(location.search);film.addEventListener('loadedmetadata',()=>{if(query.has('t')&&Number.isFinite(Number(query.get('t'))))jump(Number(query.get('t')))},{once:true});
+</script></body></html>
+

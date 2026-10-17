@@ -1,0 +1,97 @@
+{
+  "duration_seconds": 24,
+  "width": 1920,
+  "height": 1080,
+  "fps": 24,
+  "codec": "H264 / libx264",
+  "pixel_format": "yuv420p",
+  "audio": true,
+  "frames": 576,
+  "decode_exit_code": 0,
+  "sample_seconds": [
+    0,
+    5.5,
+    11,
+    16.5,
+    22,
+    23.9
+  ],
+  "data": "fictional; not live quotes",
+  "arithmetic": {
+    "total_twd": 1000000,
+    "tw_sell": {
+      "current": 400000,
+      "target": 350000,
+      "price_twd": 1000,
+      "shares": 50
+    },
+    "us_buy": {
+      "current": 200000,
+      "target": 250000,
+      "price_twd": 5000,
+      "shares": 10
+    }
+  },
+  "audio_details": {
+    "engine": "Microsoft Edge online neural TTS via edge-tts 7.3.1",
+    "voice": "zh-TW-YunJheNeural",
+    "locale": "zh-TW",
+    "rate": "-2%",
+    "pitch": "-2Hz",
+    "bgm": false,
+    "codec": "AAC LC",
+    "sample_rate_hz": 48000,
+    "channels": 1,
+    "target_loudness_lufs": -17,
+    "target_true_peak_dbtp": -2,
+    "duration_seconds": 24.0,
+    "wav_sample_peak_dbfs": -1.999515337009644,
+    "wav_clipped_samples": 0,
+    "video_frames_identical_to_silent": true,
+    "timing": [
+      {
+        "scene": 1,
+        "text": "資產分散在不同市場，配置不易一眼看清。",
+        "start_seconds": 0.12,
+        "end_seconds": 3.17069,
+        "raw_seconds": 3.0552916666666667,
+        "tempo": 1
+      },
+      {
+        "scene": 2,
+        "text": "台股、美股、日股，放進同一張配置圖。",
+        "start_seconds": 4.3,
+        "end_seconds": 8.11948,
+        "raw_seconds": 3.823,
+        "tempo": 1
+      },
+      {
+        "scene": 3,
+        "text": "對照目標配置，整股試算，規劃下一步。",
+        "start_seconds": 9.3,
+        "end_seconds": 12.5311,
+        "raw_seconds": 3.2336666666666667,
+        "tempo": 1
+      },
+      {
+        "scene": 4,
+        "text": "資料留在本機。備份，由你掌控。",
+        "start_seconds": 15.3,
+        "end_seconds": 18.88054,
+        "raw_seconds": 3.7577083333333334,
+        "tempo": 1.0496391992551215
+      },
+      {
+        "scene": 5,
+        "text": "持倉羅盤。看懂配置，讓每一步更有方向。",
+        "start_seconds": 19.3,
+        "end_seconds": 23.69787,
+        "raw_seconds": 4.399375,
+        "tempo": 1
+      }
+    ],
+    "sha256": "891ab32ca5c44101c503cc7748deaf1c31c4239fbbb503446288148748ff1415",
+    "encoded_integrated_lufs": -17.1,
+    "encoded_true_peak_dbfs": -1.7
+  }
+}
