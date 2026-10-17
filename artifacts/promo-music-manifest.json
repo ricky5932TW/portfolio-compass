@@ -1,0 +1,54 @@
+{
+  "composition": "Original procedural synthesis; no third-party songs, samples, loops or sound libraries",
+  "synthesizer": "Python standard library sine oscillators; no network",
+  "bpm": 80,
+  "meter": "4/4",
+  "chords": [
+    "Dm9",
+    "Bbmaj7",
+    "Fadd9",
+    "Csus2"
+  ],
+  "chord_duration_seconds": 6,
+  "duration_seconds": 24,
+  "sample_rate_hz": 48000,
+  "channels": 2,
+  "music_loudness": {
+    "integrated_lufs": -28.9,
+    "true_peak_dbfs": -18.6
+  },
+  "ducked_music_loudness": {
+    "integrated_lufs": -34.4,
+    "true_peak_dbfs": -20.5
+  },
+  "duck_db": -10,
+  "duck_attack_seconds": 0.12,
+  "duck_release_seconds": 0.42,
+  "duck_source": "actual narration segment start/end timings",
+  "fade_in_seconds": 0.8,
+  "fade_out_seconds": 1.8,
+  "speech_frequency_protection": "Sine-based voices and 1700Hz lowpass, 40Hz highpass",
+  "final_encoded_audio": {
+    "integrated_lufs": -17.7,
+    "true_peak_dbfs": -5.0
+  },
+  "final_mix_clipped_samples": 0,
+  "dialogue_window_voice_rms_dbfs": -16.941277671280478,
+  "dialogue_window_music_rms_dbfs": -40.94563064627778,
+  "dialogue_over_music_rms_db": 24.0043529749973,
+  "video_frames_identical_to_silent": true,
+  "decode_exit_code": 0,
+  "playback_assets": {
+    "public/promo/index.html": true,
+    "public/promo/promo.mp4": true,
+    "public/promo/poster.jpg": true,
+    "public/promo/narration.zh-TW.vtt": true,
+    "public/promo/narration.zh-TW.wav": true,
+    "dist/promo/index.html": true,
+    "dist/promo/promo.mp4": true,
+    "dist/promo/poster.jpg": true,
+    "dist/promo/narration.zh-TW.vtt": true,
+    "dist/promo/narration.zh-TW.wav": true
+  },
+  "sha256": "0638a2e40d78b8af0d80329f52aa4da98d92e3277a1361fb6c99c6e5a9f13001"
+}

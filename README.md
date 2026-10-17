@@ -85,7 +85,7 @@ npm.cmd run preview
 
 ## 宣傳動畫
 
-瀏覽器版入口為 [`public/promo/index.html`](./public/promo/index.html)，成片為 [`artifacts/promo.mp4`](./artifacts/promo.mp4)。本機開發或部署後，以網站的 `/promo/index.html` 路徑觀看互動版；預設開發網址為 `http://127.0.0.1:5173/promo/index.html`。若部署於 GitHub Pages 專案子路徑，請在該專案網址後加上 `promo/index.html`。影片中的數字為示意資料，不代表投資績效或未來報酬。配音為 Microsoft Edge 線上神經語音 `zh-TW-YunJheNeural`，沒有背景音樂；互動播放器提供繁體中文字幕。
+瀏覽器版入口為 [`public/promo/index.html`](./public/promo/index.html)，成片為 [`artifacts/promo.mp4`](./artifacts/promo.mp4)。本機開發或部署後，以網站的 `/promo/index.html` 路徑觀看互動版；預設開發網址為 `http://127.0.0.1:5173/promo/index.html`。若部署於 GitHub Pages 專案子路徑，請在該專案網址後加上 `promo/index.html`。影片中的數字為示意資料，不代表投資績效或未來報酬。配音為 Microsoft Edge 線上神經語音 `zh-TW-YunJheNeural`，搭配本機原創器樂配樂；互動播放器提供繁體中文字幕。
 
 動畫來源為 [`scripts/promo_render.py`](./scripts/promo_render.py)。在專案目錄以 Python 重製：
 
@@ -104,7 +104,17 @@ python scripts/promo_render.py
 python scripts/promo_narration.py --generate
 ```
 
-若已快取語音片段，可離線重新混音：`python scripts/promo_narration.py`。完成後執行 `npm.cmd run build`，把更新後的 MP4 和字幕複製至發布目錄。
+若已快取語音片段，可離線重新產生純旁白版。接著執行原創配樂與混音：
+
+```powershell
+python scripts/promo_narration.py
+python scripts/promo_music.py
+npm.cmd run build
+```
+
+[`promo_music.py`](./scripts/promo_music.py) 以 Python 標準庫的正弦波振盪器合成原創配樂，沒有使用第三方歌曲、取樣或曲庫，也不需連網。配樂採 80 BPM、4/4，和聲為 Dm9–Bbmaj7–Fadd9–Csus2，含柔和 pad、稀疏 pluck 與輕微脈衝；起頭 0.8 秒漸入、結尾 1.8 秒漸出。旁白時配樂降低 10 dB，並避開語音存在感頻段。
+
+配樂來源為 [`artifacts/promo-music.wav`](./artifacts/promo-music.wav)，純旁白版保存在 [`artifacts/promo-voice-only.mp4`](./artifacts/promo-voice-only.mp4)，每次成功執行 `promo_narration.py` 都會更新；請依上列順序先產生最新旁白，再執行配樂混音。最終影片仍為 `artifacts/promo.mp4` 與 `public/promo/promo.mp4`。混音腳本保留原畫面 bitstream、驗證逐幀一致性並輸出 [`promo-music-manifest.json`](./artifacts/promo-music-manifest.json) 及完整解碼與響度量測紀錄。發布前執行上述建置，將最新 MP4、旁白 WAV 與字幕一併帶入 `dist/promo/`。
 
 ## 部署
 

@@ -73,6 +73,9 @@ def main():
  if original_md5!=final_md5: raise RuntimeError('Visual frame identity check failed')
  for destination in [OUT/'promo.mp4',ROOT/'public/promo/promo.mp4',ROOT/'dist/promo/promo.mp4']:
   destination.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(final,destination)
+ # Refresh the voice-only deliverable on every successful narration mix, even
+ # when a previous scored version and voice-only backup already exist.
+ shutil.copy2(final,OUT/'promo-voice-only.mp4')
  srt=[]; vtt=['WEBVTT','']
  for i,item in enumerate(timing):
   a,b=item['start_seconds'],item['end_seconds']; text=item['text']
