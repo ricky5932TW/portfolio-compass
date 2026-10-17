@@ -1,5 +1,29 @@
 export type Market = 'TW' | 'TWO' | 'US' | 'JP';
 export type Currency = 'TWD' | 'USD' | 'JPY';
+export type MarketMinimumShares = Record<Market, number>;
+export const MARKET_MINIMUM_SHARES_KEY = 'portfolio-visualizer-v1:market-minimum-shares';
+export const DEFAULT_MARKET_MINIMUM_SHARES: MarketMinimumShares = { TW: 1, TWO: 1, US: 1, JP: 100 };
+
+export function loadMarketMinimumShares(): MarketMinimumShares {
+  try {
+    const saved: unknown = JSON.parse(window.localStorage.getItem(MARKET_MINIMUM_SHARES_KEY) ?? 'null');
+    if (typeof saved === 'object' && saved !== null) {
+      const value = saved as Partial<MarketMinimumShares>;
+      return Object.fromEntries((Object.keys(DEFAULT_MARKET_MINIMUM_SHARES) as Market[]).map((market) => {
+        const shares = value[market];
+        return [market, Number.isInteger(shares) && (shares ?? 0) > 0 && (shares ?? Infinity) <= 1_000_000 ? shares : DEFAULT_MARKET_MINIMUM_SHARES[market]];
+      })) as MarketMinimumShares;
+    }
+  } catch {
+    // Defaults apply when storage is unavailable or malformed.
+  }
+  return { ...DEFAULT_MARKET_MINIMUM_SHARES };
+}
+
+export function scaleAllocationPercent(percent?: number): number {
+  const value = Math.max(0, Math.min(100, Number.isFinite(percent) ? percent! : 0));
+  return value <= 15 ? value / 15 * 70 : 70 + (value - 15) / 85 * 30;
+}
 
 export interface Instrument {
   market: Market;
@@ -97,12 +121,19 @@ export interface PortfolioValuation {
 
 export type WholeShareAction = { side: 'buy' | 'sell' | 'none'; shares: number };
 
-export function recommendWholeShareTrade(differenceNative?: number, quotePrice?: number): WholeShareAction | null {
-  if (differenceNative === undefined || !Number.isFinite(differenceNative) || quotePrice === undefined || !Number.isFinite(quotePrice) || quotePrice <= 0) return null;
+export function recommendWholeShareTrade(differenceNative?: number, quotePrice?: number, minimumShares = 1): WholeShareAction | null {
+  if (differenceNative === undefined || !Number.isFinite(differenceNative) || quotePrice === undefined || !Number.isFinite(quotePrice) || quotePrice <= 0 || !Number.isInteger(minimumShares) || minimumShares < 1) return null;
   if (differenceNative === 0) return { side: 'none', shares: 0 };
   const side = differenceNative > 0 ? 'sell' : 'buy';
-  const shares = Math.floor(Math.abs(differenceNative) / quotePrice);
+  const rawShares = Math.floor(Math.abs(differenceNative) / quotePrice);
+  const shares = Math.floor(rawShares / minimumShares) * minimumShares;
   return { side, shares };
+}
+
+export function rebalanceAlertLevel(gapPct: number | undefined, thresholdPct: number, shares: number | undefined, minimumShares: number, isCash = false): 'none' | 'caution' | 'actionable' {
+  if (gapPct === undefined || !Number.isFinite(gapPct) || Math.abs(gapPct) < thresholdPct) return 'none';
+  if (isCash) return 'actionable';
+  return shares !== undefined && Number.isInteger(minimumShares) && minimumShares > 0 && shares >= minimumShares ? 'actionable' : 'caution';
 }
 
 export function targetPriceGapPct(currentPrice?: number, targetPrice?: number): number | null {

@@ -12,6 +12,11 @@ import {
   evaluatePortfolio,
   createManualQuote,
   recommendWholeShareTrade,
+  DEFAULT_MARKET_MINIMUM_SHARES,
+  MARKET_MINIMUM_SHARES_KEY,
+  loadMarketMinimumShares,
+  scaleAllocationPercent,
+  type MarketMinimumShares,
   targetPriceGapPct,
   targetPriceGapFromCostPct
 } from './lib/portfolio';
@@ -140,6 +145,7 @@ export default function App() {
     try { return parseDailyHistory(JSON.parse(localStorage.getItem(STORAGE_HISTORY_REAL) ?? '[]')); }
     catch { return []; }
   });
+  const [marketMinimumShares, setMarketMinimumShares] = useState<MarketMinimumShares>(loadMarketMinimumShares);
   const [manualPriceDrafts, setManualPriceDrafts] = useState<Record<string, { price: string; asOf: string }>>({});
   const importFileRef = useRef<HTMLInputElement>(null);
 
@@ -442,6 +448,7 @@ export default function App() {
     setRealDoc(INITIAL_REAL_DOC);
     setRealSnapshot(INITIAL_REAL_SNAPSHOT);
     setRealHistory([]);
+    setMarketMinimumShares({ ...DEFAULT_MARKET_MINIMUM_SHARES });
     setManualPriceDrafts({});
     setEditingIndex(null);
     setFormError(null);
@@ -702,7 +709,10 @@ export default function App() {
           </div>
         </section>
 
-        <AllocationPreview evaluation={evaluation} />
+        <AllocationPreview evaluation={evaluation} marketMinimumShares={marketMinimumShares} onMarketMinimumSharesChange={(next) => {
+          setMarketMinimumShares(next);
+          try { localStorage.setItem(MARKET_MINIMUM_SHARES_KEY, JSON.stringify(next)); } catch { /* Keep the setting for this session. */ }
+        }} />
         <HistoryTrends
           snapshots={currentHistory}
           source={mode === 'demo' ? 'demo' : 'local'}
@@ -728,15 +738,16 @@ export default function App() {
               const hasQuote = !!quote;
               const priceGapPct = targetPriceGapPct(quote?.price, instrument.longTermTargetPrice);
               const costGapPct = targetPriceGapFromCostPct(instrument.averageCost, instrument.longTermTargetPrice);
-              const shareTrade = recommendWholeShareTrade(differenceNative, quote?.price);
+              const minimumShares = marketMinimumShares[instrument.market];
+              const shareTrade = recommendWholeShareTrade(differenceNative, quote?.price, minimumShares);
               const shareAdvice = shareTrade === null
                 ? '報價或差額不足，無法計算股數'
                 : shareTrade.side === 'none'
                   ? '無需調整股數'
                   : shareTrade.shares === 0
-                    ? `建議${shareTrade.side === 'sell' ? '賣出' : '買進'}：差額不足 1 股`
+                    ? `建議${shareTrade.side === 'sell' ? '賣出' : '買進'}：差額不足 ${minimumShares} 股最低操作量`
                     : `建議${shareTrade.side === 'sell' ? '賣出' : '買進'} ${shareTrade.shares} 股`;
-              const progressStyle: React.CSSProperties = { height: 8, backgroundColor: '#e2e8f0', borderRadius: 5, position: 'relative', overflow: 'hidden', marginTop: 5 };
+              const progressStyle: React.CSSProperties = { height: 20, backgroundColor: 'transparent', borderRadius: 5, position: 'relative', overflow: 'visible', marginTop: 5 };
               const metricStyle: React.CSSProperties = { minWidth: 0, overflowWrap: 'anywhere' };
               const labelStyle: React.CSSProperties = { color: '#64748b', fontSize: 11, marginBottom: 2 };
 
@@ -756,9 +767,11 @@ export default function App() {
                       <button type="button" onClick={() => handleDeleteHolding(index)} style={{ border: '1px solid #fecaca', background: '#fff5f5', color: '#dc2626', padding: '5px 9px', borderRadius: 5, fontSize: 12, cursor: 'pointer' }}>刪除</button>
                     </div>
                   </div>
-                  <div style={progressStyle} aria-label={`目前佔比 ${formatPct(currentWeightPct)}，目標 ${formatPct(instrument.targetWeightPct)}`}>
-                    <div style={{ position: 'absolute', inset: '0 auto 0 0', width: `${Math.min(100, currentWeightPct || 0)}%`, background: '#0284c7' }} />
-                    <div style={{ position: 'absolute', inset: '0 auto 0', left: `${Math.min(99, instrument.targetWeightPct)}%`, width: 2, background: '#dc2626' }} />
+                  <div style={{ ...progressStyle, overflow: 'visible' }} aria-label={`目前佔比 ${formatPct(currentWeightPct)}，目標 ${formatPct(instrument.targetWeightPct)}`}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 8, background: '#e2e8f0', borderRadius: 5 }} />
+                    <div style={{ position: 'absolute', top: 0, left: 0, height: 8, width: `${scaleAllocationPercent(currentWeightPct)}%`, borderRadius: 5, background: '#0284c7' }} />
+                    <div style={{ position: 'absolute', top: 0, left: `${scaleAllocationPercent(instrument.targetWeightPct)}%`, width: 2, height: 8, background: '#dc2626' }} />
+                    <div aria-hidden="true" style={{ position: 'absolute', top: 8, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: 9, lineHeight: '12px' }}><span>0%</span><span style={{ position: 'absolute', left: '70%', transform: 'translateX(-50%)' }}>15%</span><span>100%</span></div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px 14px', marginTop: 12, fontSize: 13 }}>
                     <div style={metricStyle}><div style={labelStyle}>持有數量 / 平均成本</div>{formatCurrency(instrument.quantity)} 股 · {formatCurrency(instrument.averageCost, 2)} {NATIVE_CURRENCIES[instrument.market]}</div>
@@ -802,8 +815,8 @@ export default function App() {
               <div style={{ marginTop: 12, fontSize: 12, color: '#475569' }}>
                 <div>現有 {formatPct(evaluation.totalCashTwd !== undefined && evaluation.totalAssetsTwd && evaluation.totalAssetsTwd > 0 ? evaluation.totalCashTwd / evaluation.totalAssetsTwd * 100 : undefined)} · 目標 {formatPct(evaluation.cashTargetWeightPct)}</div>
                 <div style={{ height: 8, background: '#e2e8f0', borderRadius: 5, position: 'relative', overflow: 'hidden', marginTop: 5 }}>
-                  <div style={{ position: 'absolute', inset: '0 auto 0 0', width: `${Math.min(100, evaluation.totalCashTwd !== undefined && evaluation.totalAssetsTwd && evaluation.totalAssetsTwd > 0 ? evaluation.totalCashTwd / evaluation.totalAssetsTwd * 100 : 0)}%`, background: '#64748b' }} />
-                  <div style={{ position: 'absolute', top: 0, left: `${Math.min(99, evaluation.cashTargetWeightPct)}%`, width: 2, height: '100%', background: '#dc2626' }} />
+                  <div style={{ position: 'absolute', inset: '0 auto 0 0', width: `${scaleAllocationPercent(evaluation.totalCashTwd !== undefined && evaluation.totalAssetsTwd && evaluation.totalAssetsTwd > 0 ? evaluation.totalCashTwd / evaluation.totalAssetsTwd * 100 : 0)}%`, background: '#64748b' }} />
+                  <div style={{ position: 'absolute', top: 0, left: `${scaleAllocationPercent(evaluation.cashTargetWeightPct)}%`, width: 2, height: '100%', background: '#dc2626' }} />
                 </div>
                 <div style={{ marginTop: 8 }}>目標金額 {evaluation.cashTargetAmountTwd !== undefined ? `NT$ ${formatCurrency(evaluation.cashTargetAmountTwd)}` : '--'} · 差額 {evaluation.cashDifferenceTwd !== undefined ? `TWD ${formatSignedCurrency(evaluation.cashDifferenceTwd)}` : '--'}</div>
                 <div style={{ color: '#64748b', fontSize: 11, marginTop: 3 }}>{evaluation.cashDifferenceTwd === undefined ? '匯率或估值資料不足' : Math.abs(evaluation.cashDifferenceTwd) < 0.01 ? '已達目標' : evaluation.cashDifferenceTwd > 0 ? '可減少現金' : '需增加現金'} · 匯率折算</div>

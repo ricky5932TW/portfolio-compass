@@ -20,7 +20,7 @@ it('shows a held stock with a zero target and flags its allocation gap', () => {
   const evaluation: PortfolioValuation = {
     complete: true,
     missing: [],
-    holdings: [{ ...holding, currentValueTwd: 100, currentWeightPct: 100 }],
+    holdings: [{ ...holding, quote: { market: 'TW', symbol: '2330', currency: 'TWD', price: 10, asOf: '2026-10-17', source: 'test' }, differenceNative: 1000, currentValueTwd: 100, currentWeightPct: 100 }],
     cashTargetWeightPct: 0,
     totalAssetsTwd: 100,
     totalCashTwd: 0,
@@ -30,6 +30,21 @@ it('shows a held stock with a zero target and flags its allocation gap', () => {
   expect(html).toContain('目標 0.0% · 目前 100.0%');
   expect(html).toContain('超出 100.0 個百分點');
   expect(html).toContain('優先處理');
+});
+
+it('keeps an over-threshold Japanese share gap yellow below one lot and red once it reaches a lot', () => {
+  const jpHolding = { ...holding, instrument: { ...holding.instrument, market: 'JP' as const, symbol: '7203', targetWeightPct: 0 }, quote: { market: 'JP' as const, symbol: '7203', currency: 'JPY' as const, price: 100, asOf: '2026-10-17', source: 'test' } };
+  const renderGap = (differenceNative: number) => renderToStaticMarkup(createElement(AllocationPreview, { evaluation: {
+    complete: true, missing: [], holdings: [{ ...jpHolding, differenceNative, currentValueTwd: 100, currentWeightPct: 10 }],
+    cashTargetWeightPct: 0, totalAssetsTwd: 1000, totalCashTwd: 0,
+  } }));
+  const belowLot = renderGap(9900);
+  expect(belowLot).toContain('比例已超過警示值，但估算差距不足最低操作量（100 股）');
+  expect(belowLot).toContain('差距未達 100 股');
+  expect(belowLot).not.toContain('優先處理');
+  const reachesLot = renderGap(10000);
+  expect(reachesLot).toContain('優先處理');
+  expect(reachesLot).not.toContain('差距未達 100 股');
 });
 
 it('separates over and under allocations and sorts each by the largest percentage gap', () => {

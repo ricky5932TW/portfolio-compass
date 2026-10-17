@@ -1,5 +1,5 @@
 import React from 'react';
-import type { PortfolioValuation } from '../lib/portfolio';
+import { DEFAULT_MARKET_MINIMUM_SHARES, recommendWholeShareTrade, rebalanceAlertLevel, type Market, type MarketMinimumShares, type PortfolioValuation } from '../lib/portfolio';
 
 export const ALLOCATION_PALETTE = [
   '#2563eb', '#059669', '#d97706', '#7c3aed', '#db2777',
@@ -42,6 +42,9 @@ interface TargetLegendRow extends Slice {
   gapPct?: number;
   currentLabel?: string;
   unallocated?: boolean;
+  market?: Market;
+  suggestedShares?: number;
+  minimumShares?: number;
 }
 
 function buildGradient(slices: Slice[], total: number): string {
@@ -90,12 +93,22 @@ function buildPieLabels(slices: Slice[], total: number, size: number) {
 
 export default function AllocationPreview({
   evaluation,
+  marketMinimumShares = DEFAULT_MARKET_MINIMUM_SHARES,
+  onMarketMinimumSharesChange,
 }: {
   evaluation: PortfolioValuation;
+  marketMinimumShares?: MarketMinimumShares;
+  onMarketMinimumSharesChange?: (value: MarketMinimumShares) => void;
 }) {
   const { holdings = [], totalAssetsTwd = 0, totalCashTwd, complete, cashTargetWeightPct } = evaluation;
   const [gapThreshold, setGapThreshold] = React.useState(savedThreshold);
   const [thresholdInput, setThresholdInput] = React.useState(() => String(savedThreshold()));
+  const [minimumInputs, setMinimumInputs] = React.useState<Record<Market, string>>(() => Object.fromEntries(
+    (Object.keys(DEFAULT_MARKET_MINIMUM_SHARES) as Market[]).map((market) => [market, String(marketMinimumShares[market])]),
+  ) as Record<Market, string>);
+  React.useEffect(() => setMinimumInputs(Object.fromEntries(
+    (Object.keys(DEFAULT_MARKET_MINIMUM_SHARES) as Market[]).map((market) => [market, String(marketMinimumShares[market])]),
+  ) as Record<Market, string>), [marketMinimumShares]);
 
   const updateThreshold = (raw: string) => {
     setThresholdInput(raw);
@@ -212,6 +225,9 @@ export default function AllocationPreview({
       currentPct,
       gapPct: currentPct === undefined ? undefined : pct - currentPct,
       currentLabel: '目前',
+      market: h.instrument.market,
+      minimumShares: marketMinimumShares[h.instrument.market],
+      suggestedShares: recommendWholeShareTrade(h.differenceNative, h.quote?.price, marketMinimumShares[h.instrument.market])?.shares,
     }];
   });
   const currentCashPct = isCurrentValid ? (currentPctById.get('__cash__') ?? 0) : undefined;
@@ -307,7 +323,10 @@ export default function AllocationPreview({
   const renderTargetLegendRows = (rows: TargetLegendRow[]) => (
     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
       {rows.map((row) => {
-        const alert = !row.unallocated && row.gapPct !== undefined && Math.abs(row.gapPct) >= gapThreshold;
+        const alertLevel = rebalanceAlertLevel(row.gapPct, gapThreshold, row.suggestedShares, row.minimumShares ?? 1, row.id === '__cash__');
+        const alert = alertLevel === 'actionable';
+        const caution = alertLevel === 'caution';
+        const alertColor = alert ? '#b91c1c' : '#a16207';
         const gapText = row.unallocated ? '尚未分配' : row.gapPct === undefined
           ? (complete ? '差距：尚無資產' : '差距：估值不完整')
           : Math.abs(row.gapPct) < 0.05
@@ -320,9 +339,9 @@ export default function AllocationPreview({
             key={row.id}
             style={{
               padding: '5px 6px', borderRadius: 6,
-              backgroundColor: alert ? '#fef2f2' : '#f8fafc',
-              border: `1px solid ${alert ? '#fecaca' : '#e2e8f0'}`,
-              color: alert ? '#b91c1c' : '#334155',
+              backgroundColor: alert ? '#fef2f2' : caution ? '#fffbeb' : '#f8fafc',
+              border: `1px solid ${alert ? '#fecaca' : caution ? '#fde68a' : '#e2e8f0'}`,
+              color: alert ? '#b91c1c' : caution ? '#92400e' : '#334155',
               fontSize: 11, lineHeight: 1.4,
             }}
           >
@@ -342,12 +361,13 @@ export default function AllocationPreview({
               >
                 {row.unrealizedPlPct === undefined ? '報酬 —' : `報酬 ${row.unrealizedPlPct >= 0 ? '+' : ''}${row.unrealizedPlPct.toFixed(1)}%`}
               </span>}
-              {alert && <strong style={{ marginLeft: 'auto', flexShrink: 0 }}>優先處理</strong>}
+              {(alert || caution) && <strong style={{ marginLeft: 'auto', flexShrink: 0, color: alertColor }}>{alert ? '優先處理' : `差距未達 ${row.minimumShares} 股`}</strong>}
             </div>
             <div style={{ paddingLeft: 14, fontVariantNumeric: 'tabular-nums' }}>
               目標 {row.pct.toFixed(1)}% · {row.currentLabel ?? '目前'} {row.currentPct === undefined ? '—' : `${row.currentPct.toFixed(1)}%`}
               <br />
               {gapText}
+              {caution && <><br /><span style={{ color: alertColor }}>比例已超過警示值，但估算差距不足最低操作量（{row.minimumShares} 股）</span></>}
             </div>
           </li>
         );
@@ -458,6 +478,27 @@ export default function AllocationPreview({
           />
           <span style={{ color: '#64748b' }}>達門檻時標紅</span>
         </label>
+        <fieldset style={{ border: 0, padding: 0, margin: '10px 0 0', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 11, color: '#475569' }}>
+          <legend style={{ padding: 0, marginBottom: 4, fontWeight: 600 }}>各市場最低操作股數</legend>
+          {([['TW', '台股'], ['TWO', '上櫃'], ['US', '美股'], ['JP', '日股']] as const).map(([market, label]) => (
+            <label key={market} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {label}
+              <input aria-label={`${label}最低操作股數`} type="number" min="1" max="1000000" step="1" value={minimumInputs[market]}
+                onChange={(event) => {
+                  const raw = event.target.value;
+                  setMinimumInputs((current) => ({ ...current, [market]: raw }));
+                  const value = Number(raw);
+                  if (raw.trim() && Number.isInteger(value) && value >= 1 && value <= 1_000_000) onMarketMinimumSharesChange?.({ ...marketMinimumShares, [market]: value });
+                }}
+                onBlur={() => {
+                  const value = Number(minimumInputs[market]);
+                  if (!Number.isInteger(value) || value < 1 || value > 1_000_000) setMinimumInputs((current) => ({ ...current, [market]: String(marketMinimumShares[market]) }));
+                }}
+                style={{ width: 60, padding: '3px 5px', border: '1px solid #cbd5e1', borderRadius: 4, fontSize: 12 }} />
+            </label>
+          ))}
+          <span style={{ color: '#64748b' }}>預設：台股／美股 1 股，日股 100 股</span>
+        </fieldset>
         <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginTop: 12, marginBottom: 5 }}>再平衡差距</div>
         {renderTargetLegend()}
       </div>

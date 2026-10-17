@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluatePortfolio, validatePortfolioDocument, PortfolioDocument, MarketSnapshot, createManualQuote, recommendWholeShareTrade, targetPriceGapPct, targetPriceGapFromCostPct } from '../src/lib/portfolio';
+import { evaluatePortfolio, validatePortfolioDocument, PortfolioDocument, MarketSnapshot, createManualQuote, recommendWholeShareTrade, targetPriceGapPct, targetPriceGapFromCostPct, scaleAllocationPercent, rebalanceAlertLevel, DEFAULT_MARKET_MINIMUM_SHARES } from '../src/lib/portfolio';
 
 describe('Portfolio Evaluation & Validation', () => {
   it('validates explicit cash targets together with stock targets and permits unallocated remainder', () => {
@@ -146,6 +146,21 @@ describe('Portfolio Evaluation & Validation', () => {
     expect(recommendWholeShareTrade(275, undefined)).toBeNull();
     expect(recommendWholeShareTrade(undefined, 100)).toBeNull();
     expect(recommendWholeShareTrade(275, 0)).toBeNull();
+    expect(recommendWholeShareTrade(2750, 100, 100)).toEqual({ side: 'sell', shares: 0 });
+    expect(recommendWholeShareTrade(-12550, 100, 100)).toEqual({ side: 'buy', shares: 100 });
+    expect(DEFAULT_MARKET_MINIMUM_SHARES).toEqual({ TW: 1, TWO: 1, US: 1, JP: 100 });
+  });
+
+  it('expands the 0–15% range and gates warning color on the minimum tradable lot', () => {
+    expect(scaleAllocationPercent(0)).toBe(0);
+    expect(scaleAllocationPercent(15)).toBe(70);
+    expect(scaleAllocationPercent(100)).toBe(100);
+    expect(scaleAllocationPercent(-1)).toBe(0);
+    expect(scaleAllocationPercent(101)).toBe(100);
+    expect(rebalanceAlertLevel(8, 5, 0, 100)).toBe('caution');
+    expect(rebalanceAlertLevel(8, 5, 100, 100)).toBe('actionable');
+    expect(rebalanceAlertLevel(4, 5, 100, 100)).toBe('none');
+    expect(rebalanceAlertLevel(8, 5, undefined, 100, true)).toBe('actionable');
   });
 
   it('calculates price distance to a long-term target and accepts only positive optional targets', () => {
