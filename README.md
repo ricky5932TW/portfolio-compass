@@ -33,7 +33,7 @@ npm run dev
 
 ## 部署
 
-此專案是純靜態 Vite 網站，可部署到 Vercel、Cloudflare Pages 或任何支援靜態網站的主機。建置命令為 `npm run build`，輸出資料夾為 `dist`。若連結 GitHub，推送至主分支即可觸發自動部署。
+此專案是純靜態 Vite 網站，可部署到 Vercel、Cloudflare Pages、GitHub Pages 或任何支援靜態網站的主機。建置命令為 `npm run build`，輸出資料夾為 `dist`。Vercel 匯入 repo 時使用 Vite 預設值即可；GitHub Pages 可在 repository 的 Settings → Pages 將來源設為 GitHub Actions，之後推送 `main` 會自動建置與部署。
 
 ## 開發檢查
 
