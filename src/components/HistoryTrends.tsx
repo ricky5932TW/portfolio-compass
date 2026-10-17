@@ -39,7 +39,7 @@ export default function HistoryTrends({ snapshots, source, onRetry, error }: {
       {error} {onRetry && <button type="button" className="secondary-button" onClick={onRetry}>重試紀錄</button>}
     </div>}
     {rows.length === 0 ? <div style={{ marginTop: 16, padding: '24px 14px', textAlign: 'center', border: '1px dashed #cbd5e1', borderRadius: 8, color: '#64748b', fontSize: 14 }}>
-      {source === 'demo' ? '切回本機或雲端模式後，完整估值會開始累積每日紀錄。' : '目前沒有歷史資料。行情與匯率完整時，系統會從今日開始記錄。'}
+      {source === 'demo' ? '切回本機資料後，完整估值會開始累積每日紀錄。' : '目前沒有歷史資料。資料完整時，系統會從今日開始記錄。'}
     </div> : <>
       <div style={{ marginTop: 16, fontSize: 13, fontWeight: 650, color: '#334155' }}>總資產（新台幣）</div>
       <div style={{ width: '100%', overflowX: 'auto' }}>

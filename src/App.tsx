@@ -542,7 +542,7 @@ export default function App() {
               onClick={handleClearLocalData}
               className="secondary-button"
               style={{ borderColor: '#fecaca', color: '#b91c1c' }}
-              title="清除此瀏覽器保存的本機資料，不會刪除雲端版本。"
+              title="清除此瀏覽器保存的所有本機持倉、估值和歷史紀錄。"
             >
               刪除本機資料
             </button>}
