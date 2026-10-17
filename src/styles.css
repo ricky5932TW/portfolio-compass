@@ -1,0 +1,271 @@
+:root {
+  --bg-slate: #f1f5f9;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --accent-blue: #2563eb;
+  --accent-blue-hover: #1d4ed8;
+  --focus-ring: rgba(37, 99, 235, 0.35);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.allocation-pie-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 540px;
+  margin: 10px auto 0;
+}
+
+@media (max-width: 380px) {
+  .allocation-pie-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  background-color: var(--bg-slate);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.brand-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+  align-items: center;
+  min-height: 390px;
+  padding: clamp(28px, 5vw, 64px);
+  overflow: hidden;
+  color: #f8fafc;
+  background: radial-gradient(ellipse at 80% 50%, #1d4260 0%, transparent 38%), linear-gradient(125deg, #0b1728, #142b45 72%, #183b55);
+  border: 1px solid #24435f;
+  border-radius: 24px;
+  box-shadow: 0 24px 55px rgba(15, 35, 55, .15);
+}
+
+.hero-copy { position: relative; z-index: 2; max-width: 650px; }
+.eyebrow { margin: 0 0 16px; color: #8eddd0; font-size: 11px; font-weight: 800; letter-spacing: .19em; }
+.hero-copy h1 { margin: 0; font-size: clamp(38px, 5vw, 58px); line-height: 1.18; letter-spacing: -.055em; }
+.hero-copy h1 span { color: #a3e5db; }
+.hero-description { max-width: 520px; margin: 20px 0 24px; color: #c6d4e2; font-size: 16px; line-height: 1.9; }
+.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; }
+.hero-cta { display: inline-flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 9px; color: #082334; background: #9ce7d6; font-size: 14px; font-weight: 800; text-decoration: none; box-shadow: 0 8px 24px rgba(92, 213, 183, .18); transition: transform .2s, background .2s; }
+.hero-cta:hover { transform: translateY(-2px); background: #b8f2e5; }
+.hero-private { color: #d8e5ef; font-size: 12px; }
+.hero-private span { margin-right: 6px; color: #79e0be; font-size: 9px; }
+.hero-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+.hero-pills span { padding: 6px 10px; border: 1px solid rgba(209, 229, 242, .18); border-radius: 999px; color: #d6e5ed; font-size: 11px; }
+.hero-art { position: relative; display: grid; place-items: center; min-height: 280px; }
+.hero-glow { position: absolute; width: 210px; height: 210px; border-radius: 50%; background: #66d3c0; filter: blur(70px); opacity: .15; }
+.hero-ring { position: absolute; border: 1px solid rgba(159, 227, 218, .32); border-radius: 50%; transform: rotate(-28deg); }
+.ring-one { width: 248px; height: 108px; animation: orbit 18s linear infinite; }
+.ring-two { width: 248px; height: 108px; transform: rotate(42deg); border-color: rgba(163, 196, 237, .26); animation: orbit 23s linear infinite reverse; }
+.hero-orb { display: grid; place-items: center; width: 146px; height: 146px; border: 1px solid rgba(178, 239, 226, .55); border-radius: 50%; background: radial-gradient(circle at 34% 30%, #2c6372, #10243a 68%); box-shadow: inset 0 0 35px rgba(150, 235, 220, .16), 0 0 50px rgba(150, 235, 220, .1); text-align: center; color: #c8eae2; font-size: 13px; letter-spacing: .12em; }
+.hero-orb strong { color: #fff; font-size: 25px; letter-spacing: .05em; }
+.hero-chip { position: absolute; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid rgba(207, 227, 243, .18); border-radius: 10px; color: #c9d8e5; background: rgba(12, 29, 47, .84); box-shadow: 0 10px 30px rgba(0, 0, 0, .18); font-size: 10px; white-space: nowrap; }
+.hero-chip i { width: 7px; height: 7px; border-radius: 50%; background: #7ee1c7; box-shadow: 0 0 12px #7ee1c7; }
+.hero-chip b { color: #f8fafc; font-size: 11px; }
+.chip-top { top: 24px; right: 0; }
+.chip-bottom { bottom: 26px; left: 0; }
+.privacy-strip { display: flex; align-items: center; gap: 14px; padding: 15px 18px; border: 1px solid #cbe8df; border-radius: 12px; color: #254d48; background: #edf8f4; }
+.privacy-strip > span { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 10px; color: #117662; background: #d6f2e9; font-size: 18px; }
+.privacy-strip p { margin: 0; font-size: 13px; line-height: 1.7; }
+.feature-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.feature-row article { padding: 20px; border: 1px solid #e0e8ed; border-radius: 14px; background: linear-gradient(145deg, #fff, #f9fbfc); }
+.feature-number { display: inline-block; margin-bottom: 18px; color: #4e9d8b; font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+.feature-row h2 { margin: 0 0 8px; font-size: 17px; }
+.feature-row p { margin: 0; color: #68798a; font-size: 13px; line-height: 1.8; }
+.site-footer { max-width: 1280px; margin: 20px auto 0; padding: 28px 24px 44px; color: #667789; text-align: center; font-size: 12px; line-height: 1.8; }
+.site-footer p { margin: 5px 0; }
+.site-footer strong { color: #24394e; }
+.site-footer a { color: #236c68; }
+@keyframes orbit { to { rotate: 332deg; } }
+@media (prefers-reduced-motion: reduce) { .ring-one, .ring-two, .hero-cta { animation: none; transition: none; } }
+
+.portfolio-main {
+  padding: 0 24px 24px;
+}
+
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease-in-out;
+}
+
+.primary-button, .secondary-button {
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.primary-button { border: 1px solid #1d4ed8; background: #2563eb; color: white; }
+.primary-button:hover:not(:disabled) { background: #1d4ed8; }
+.secondary-button { border: 1px solid #cbd5e1; background: white; color: #24364f; }
+.secondary-button:hover:not(:disabled) { background: #f1f5f9; }
+button:disabled { cursor: not-allowed; opacity: .65; }
+
+button:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+input, select, textarea {
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: none;
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 3px var(--focus-ring) !important;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+}
+
+th, td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+@media (max-width: 680px) {
+  .brand-hero { grid-template-columns: 1fr; min-height: 0; padding: 30px 24px 14px; border-radius: 18px; }
+  .hero-copy h1 { font-size: 39px; }
+  .hero-description { margin: 15px 0 19px; font-size: 14px; }
+  .hero-pills { margin-top: 20px; }
+  .hero-art { min-height: 250px; }
+  .ring-one, .ring-two { width: 220px; height: 100px; }
+  .hero-orb { width: 132px; height: 132px; }
+  .chip-top { right: 4px; top: 16px; }
+  .chip-bottom { left: 2px; bottom: 18px; }
+  .feature-row { grid-template-columns: 1fr; gap: 10px; }
+  .feature-row article { padding: 16px; }
+  .feature-number { margin-bottom: 10px; }
+  .site-footer { padding: 24px 12px 36px; }
+  header, [role="banner"] {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+
+  main, [role="main"] {
+    padding: 12px !important;
+  }
+
+
+  body {
+    font-size: 0.875rem;
+  }
+
+  h1 { font-size: 1.35rem !important; }
+  h2 { font-size: 1.2rem !important; }
+  h3 { font-size: 1.05rem !important; }
+
+  table,
+  thead,
+  tbody,
+  tr,
+  td {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  thead {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  tbody tr {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+    margin: 0 !important;
+  }
+
+  tbody td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    text-align: right !important;
+    padding: 8px 0 !important;
+    border: none !important;
+    border-bottom: 1px solid #f8fafc !important;
+    min-height: 38px !important;
+    font-size: 0.875rem !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  tbody td:last-child {
+    border-bottom: none !important;
+    padding-top: 10px !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+  }
+
+  tbody td::before {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: left;
+    margin-right: 12px;
+    flex-shrink: 0;
+    font-size: 0.8125rem;
+  }
+
+  tbody td:nth-child(1)::before { content: '市場/代號'; }
+  tbody td:nth-child(2)::before { content: '名稱'; }
+  tbody td:nth-child(3)::before { content: '持有數量'; }
+  tbody td:nth-child(4)::before { content: '平均成本'; }
+  tbody td:nth-child(5)::before { content: '當前市價'; }
+  tbody td:nth-child(6)::before { content: '現值 (TWD)'; }
+  tbody td:nth-child(7)::before { content: '實際 vs 目標佔比'; }
+  tbody td:nth-child(8)::before { content: '目標試算 (TWD)'; }
+  tbody td:nth-child(9)::before { content: '配置差額 (現值−目標)／建議股數'; }
+  tbody td:nth-child(10)::before { content: '未實現損益 (台幣／原始幣別)'; }
+  tbody td:nth-child(11)::before { content: '行情來源與狀態'; }
+  tbody td:nth-child(12)::before { content: '操作'; }
+}
